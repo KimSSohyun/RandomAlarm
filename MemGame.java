@@ -1,6 +1,8 @@
 package com.sohyun.androidproj;
 //datamodel
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -23,99 +25,77 @@ public class MemGame {
         level = 1;
         idx = 0;
         quiz = new ArrayList<Integer>();
-        quizarray1 = new int[16];
-        quizarray2 = new int[4][4];
+        quizarrs = new int[level][maxButton];
+        btnarr = new int[maxdy][maxdx];
         makeQuiz();
     }
     public MemGame(int l) throws Exception{
         level = l;
         idx = 0;
         quiz = new ArrayList<Integer>();
+        quizarrs = new int[level][maxButton];
+        btnarr = new int[maxdy][maxdx];
         makeQuiz();
     }
 
     private int level;
     private int idx;
-    private int[] quizarray1;
-    private int[][] quizarray2;
+    private int[][] quizarrs;
+    private int[][] btnarr;
     public ArrayList<Integer> quiz;
-    private final int BtnNum = 16;
+    private final int maxdx = 4, maxdy = 4;
+    private final int maxButton = maxdx*maxdy;
 
     private void makeQuiz(){
         int i, rand;
         Random random = new Random();
+        quizarrs = new int[level][maxButton];
         for(i = 0; i<level; i++){
-            rand = random.nextInt(BtnNum);
+            rand = random.nextInt(maxButton);
+            Log.d("MemGame", "rand - " + (rand+1));
             quiz.add(rand);
-            quizarray1[rand] = 1;
+            quizarrs[i][rand] = 1;
         }
     }
 
-    public int[][] get_array(){
-        quizarray2 = FirstToSecondArr(quizarray1);
-        return quizarray2;
+    public int[][] get_array(int num){
+        btnarr = FirstToSecondArr(quizarrs[num]);
+        return btnarr;
     }
-    private int[][] FirstToSecondArr(int[] array){
+    public int[][] FirstToSecondArr(int[] array){
         int i, j;
-        for(i=0; i<4; i++){
-            for(j=0; j<4; j++){
-                quizarray2[i][j] = array[i*4+j];
+        for(i=0; i<maxdy; i++){
+            for(j=0; j<maxdx; j++){
+                btnarr[i][j] = array[i*maxdy+j];
             }
         }
-        return quizarray2;
+        return btnarr;
     }
 
-    public GameState accept(char key) throws Exception{
+    public GameState accept(int key) throws Exception{
         GameState state = GameState.Running;
-        char quizkey = NumtoAscii(quiz.get(idx));
+//        char quizkey = NumtoAscii(quiz.get(idx));
+        int quizkey = quiz.get(idx);
+        Log.d("MemGame", "quiz key:"+quizkey+", accept key:"+key);
         if(key == quizkey) {
             idx++;
-            if(idx == level) return GameState.NewQuiz;
+            if(idx == level) {
+                idx = 0;
+                level++;
+                makeQuiz();
+                return GameState.NewQuiz;
+            }
             return GameState.Running;
         }
+        else if(key == -1){ return state; }
         else {
             idx = 0;
             return GameState.Over;
         }
-        /*switch (key) {
-            case '0':
-                break;
-            case '1':
-                break;
-            case '2':
-                break;
-            case '3':
-                break;
-            case '4':
-                break;
-            case '5':
-                break;
-            case '6':
-                break;
-            case '7':
-                break;
-            case '8':
-                break;
-            case '9':
-                break;
-            case 'a':
-                break;
-            case 'b':
-                break;
-            case 'c':
-                break;
-            case 'd':
-                break;
-            case 'e':
-                break;
-            case 'f':
-                break;
-        }
-        return state;*/
     }
 
-    public char NumtoAscii(int num){
-        if(num < 10) return (char) num;
+    private char NumtoAscii(int num){
+        if(num < 10) return (char)('0' + num);
         else return (char)('a'+ num - 10);
     }
 }
