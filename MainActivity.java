@@ -1,6 +1,7 @@
 package com.sohyun.androidproj;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -8,7 +9,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends Activity {
     enum UICmd{
@@ -22,7 +27,7 @@ public class MainActivity extends Activity {
         }
     }
     enum UIState{
-        Error(-1), Init(0), Show(1),  Running(2), Paused(3);
+        Error(-1), Init(0), Running(1), Paused(2);
         private final int value;
         private UIState(int value){ this.value = value; }
         public int value(){ return value; }
@@ -30,22 +35,19 @@ public class MainActivity extends Activity {
             switch(value){
                 case -1: return Error;
                 case 0: return Init;
-                case 1: return Show;
-                case 2: return Running;
-                case 3: return Paused;
+                case 1: return Running;
+                case 2: return Paused;
             }
             return null;
         }
     }
     int[][] stateMatrix = {
-            {-1, 2, -1, -1, -1},
-            {0, 2, 3, -1, -1},
-            {0, 2, 3, -1, 2},
-            {0, 2, -1, 2, 2},
+            {-1, 1, -1, -1, -1},
+            {0, 1, 2, -1, 1},
+            {0, 1, -1, 1, 1},
     };
     boolean[][] buttonState = {
             {true, false, false},
-            {true, true, false},
             {true, true, true},
             {false, true, false},
     };
@@ -54,17 +56,27 @@ public class MainActivity extends Activity {
     private Button startBtn, pauseBtn;
     private Button Btn1, Btn2, Btn3, Btn4, Btn5, Btn6, Btn7, Btn8, Btn9, Btn10, Btn11,
             Btn12, Btn13, Btn14, Btn15, Btn16;
-    private MemGame myGame, peerGame;
     private int myKey, peerKey;
     private UIState uiState = UIState.Init;
     private MainActivity thisObject;
-    private Handler mainHandler;
+    private Handler mainHandler, TimerHandler;
     private int level;
+    private TextView levelText, TimeCounter;
+    private Timer timer;
+    private int sec, minisec;
+
+    private final int getNetConfigInfo = 0;
+    private String serverHostName = "220.149.85.227";
+    private int serverPort = 9866;
+//    private EchoServer echoServer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_touch);
+
+        levelText = (TextView)findViewById(R.id.levelText);
+        TimeCounter = (TextView)findViewById(R.id.TimeCounter);
         myView = (MemView) findViewById(R.id.myView);
         peerView = (MemView) findViewById(R.id.peerView);
         startBtn = (Button) findViewById(R.id.startBtn);
@@ -106,9 +118,11 @@ public class MainActivity extends Activity {
         Btn16.setOnClickListener(OnClickListener);
 
         mainHandler = new Handler();
+        TimerHandler = new Handler();
         thisObject = MainActivity.this;
         setButtonsState();
         level = 1;
+//        echoServer = new EchoServer(mainHandler2, thisObject);
     }
     private View.OnClickListener OnClickListener = new View.OnClickListener() {
         public void onClick(View v){
@@ -117,7 +131,10 @@ public class MainActivity extends Activity {
             UICmd uiCmd = UICmd.Finish;
             switch (id) {
                 case R.id.startBtn:
-                    if(uiState == uiState.Init) uiCmd = UICmd.Start;
+                    if(uiState == uiState.Init) {
+                        uiCmd = UICmd.Start;
+                        sec = 60; minisec = 0;
+                    }
                     else if (uiState == UIState.Running) {
                         executeUICmd(UICmd.Finish);
                         return;
@@ -126,118 +143,33 @@ public class MainActivity extends Activity {
                     Log.d("MainActivity", "startBtn pressed");
                     break;
                 case R.id.pauseBtn:
-                    if(uiState == UIState.Running || uiState == UIState.Show)
-                        uiCmd = UICmd.Pause;
+                    if(uiState == UIState.Running) uiCmd = UICmd.Pause;
                     else if(uiState == UIState.Paused) uiCmd = UICmd.Resume;
                     else Log.e("MainActivity", "uiState error!");
                     break;
-                case R.id.btn1:
-//                    Btn1.setBackgroundColor(0xFF000000);
-                    myKey = 0;
-                    uiCmd = UICmd.Update;
-                    break;
-                case R.id.btn2:
-//                    Btn2.setBackgroundColor(0xFF000000);
-                    myKey = 1;
-                    uiCmd = UICmd.Update;
-                    break;
-                case R.id.btn3:
-//                    Btn3.setBackgroundColor(0xFF000000);
-                    myKey = 2;
-                    uiCmd = UICmd.Update;
-                    break;
-                case R.id.btn4:
-//                    Btn4.setBackgroundColor(0xFF000000);
-                    myKey = 3;
-                    uiCmd = UICmd.Update;
-                    break;
-                case R.id.btn5:
-//                    Btn5.setBackgroundColor(0xFF000000);
-                    myKey = 4;
-                    uiCmd = UICmd.Update;
-                    break;
-                case R.id.btn6:
-//                    Btn6.setBackgroundColor(0xFF000000);
-                    myKey = 5;
-                    uiCmd = UICmd.Update;
-                    break;
-                case R.id.btn7:
-//                    Btn7.setBackgroundColor(0xFF000000);
-                    myKey = 6;
-                    uiCmd = UICmd.Update;
-                    break;
-                case R.id.btn8:
-//                    Btn8.setBackgroundColor(0xFF000000);
-                    myKey = 7;
-                    uiCmd = UICmd.Update;
-                    break;
-                case R.id.btn9:
-//                    Btn9.setBackgroundColor(0xFF000000);
-                    myKey = 8;
-                    uiCmd = UICmd.Update;
-                    break;
-                case R.id.btn10:
-//                    Btn10.setBackgroundColor(0xFF000000);
-                    myKey = 9;
-                    uiCmd = UICmd.Update;
-                    break;
-                case R.id.btn11:
-//                    Btn11.setBackgroundColor(0xFF000000);
-                    myKey = 10;
-                    uiCmd = UICmd.Update;
-                    break;
-                case R.id.btn12:
-//                    Btn12.setBackgroundColor(0xFF000000);
-                    myKey = 11;
-                    uiCmd = UICmd.Update;
-                    break;
-                case R.id.btn13:
-//                    Btn13.setBackgroundColor(0xFF000000);
-                    myKey = 12;
-                    uiCmd = UICmd.Update;
-                    break;
-                case R.id.btn14:
-//                    Btn14.setBackgroundColor(0xFF000000);
-                    myKey = 13;
-                    uiCmd = UICmd.Update;
-                    break;
-                case R.id.btn15:
-//                    Btn15.setBackgroundColor(0xFF000000);
-                    myKey = 14;
-                    uiCmd = UICmd.Update;
-                    break;
-                case R.id.btn16:
-//                    Btn16.setBackgroundColor(0xFF000000);
-                    myKey = 15;
-                    uiCmd = UICmd.Update;
-                    break;
-                default:
-                    break;
+                case R.id.btn1: myKey = 0; uiCmd = UICmd.Update; break;
+                case R.id.btn2: myKey = 1; uiCmd = UICmd.Update; break;
+                case R.id.btn3: myKey = 2; uiCmd = UICmd.Update; break;
+                case R.id.btn4: myKey = 3; uiCmd = UICmd.Update; break;
+                case R.id.btn5: myKey = 4; uiCmd = UICmd.Update; break;
+                case R.id.btn6: myKey = 5; uiCmd = UICmd.Update; break;
+                case R.id.btn7: myKey = 6; uiCmd = UICmd.Update; break;
+                case R.id.btn8: myKey = 7; uiCmd = UICmd.Update; break;
+                case R.id.btn9: myKey = 8; uiCmd = UICmd.Update; break;
+                case R.id.btn10: myKey = 9; uiCmd = UICmd.Update; break;
+                case R.id.btn11: myKey = 10; uiCmd = UICmd.Update; break;
+                case R.id.btn12: myKey = 11; uiCmd = UICmd.Update; break;
+                case R.id.btn13: myKey = 12; uiCmd = UICmd.Update; break;
+                case R.id.btn14: myKey = 13; uiCmd = UICmd.Update; break;
+                case R.id.btn15: myKey = 14; uiCmd = UICmd.Update; break;
+                case R.id.btn16: myKey = 15; uiCmd = UICmd.Update; break;
+                default: break;
             }
             peerKey = myKey;
             myView.printClickBtn(myKey);
             executeUICmd(uiCmd);
         }
     };
-
-//    public void clearButtonColor(){
-//        Btn1.setBackgroundColor(0xffffffff);
-//        Btn2.setBackgroundColor(0xffffffff);
-//        Btn3.setBackgroundColor(0xffffffff);
-//        Btn4.setBackgroundColor(0xffffffff);
-//        Btn5.setBackgroundColor(0xffffffff);
-//        Btn6.setBackgroundColor(0xffffffff);
-//        Btn7.setBackgroundColor(0xffffffff);
-//        Btn8.setBackgroundColor(0xffffffff);
-//        Btn9.setBackgroundColor(0xffffffff);
-//        Btn10.setBackgroundColor(0xffffffff);
-//        Btn11.setBackgroundColor(0xffffffff);
-//        Btn12.setBackgroundColor(0xffffffff);
-//        Btn13.setBackgroundColor(0xffffffff);
-//        Btn14.setBackgroundColor(0xffffffff);
-//        Btn15.setBackgroundColor(0xffffffff);
-//        Btn16.setBackgroundColor(0xffffffff);
-//    }
 
     private void executeUICmd(UICmd c){
         Log.d("MainActivity", "(uiState, uiCmd)=(" + uiState.value() + "," + c.value() + ")");
@@ -246,23 +178,28 @@ public class MainActivity extends Activity {
             return;
         }
         uiState = UIState.fromInteger(stateMatrix[uiState.value()][c.value()]);
-        if(uiState == UIState.Error) Log.e("MainActivity", "uiState error!");
+        if(uiState == UIState.Error) {
+            Log.e("MainActivity", "uiState error!");
+            uiState = UIState.Init;
+            return;
+        }
         switch (c.value()){
-            case 0: mainHandler.post(finishRunnable); break;
-            case 1: mainHandler.post(startRunnable); break;
-            case 2: mainHandler.post(pauseRunnable); break;
-            case 3: mainHandler.post(resumeRunnable); break;
+            case 0: deactivateTimer(); mainHandler.post(finishRunnable); break;
+            case 1: activateTimer(); mainHandler.post(startRunnable); break;
+            case 2: deactivateTimer(); mainHandler.post(pauseRunnable); break;
+            case 3: activateTimer(); mainHandler.post(resumeRunnable); break;
             case 4: mainHandler.post(updateRunnable); break;
         }
     }
     private Runnable finishRunnable = new Runnable() {
         @Override
         public void run() {
-            //echoServer.disconnect();
+//            echoServer.disconnect();
             setButtonsState();
             thisObject.startBtn.setText("START");
             thisObject.pauseBtn.setText("PAUSE");
             level = 1;
+            deactivateTimer();
             Toast.makeText(thisObject, "Game Over", Toast.LENGTH_SHORT).show();
         }
     };
@@ -271,11 +208,13 @@ public class MainActivity extends Activity {
         public void run() {
             try{
                 Log.d("MainActivity", "newly created!");
-                Toast.makeText(thisObject, "Level"+level, Toast.LENGTH_SHORT);
+                levelText.setText("Level" + level);
                 myView.start(level);
                 myView.printQuiz(level);
-//                peerView.start(level);
-//                peerView.printQuiz(level);
+                peerView.start(level);
+                peerView.newGame = myView.newGame;
+                peerView.printQuiz(level);
+//                echoServer.connect(serverHostName, serverPort);
             } catch (Exception e) { e.printStackTrace(); }
             setButtonsState();
             thisObject.startBtn.setText("QUIT");
@@ -286,7 +225,7 @@ public class MainActivity extends Activity {
         @Override
         public void run() {
             setButtonsState();
-            myView.deactivateTimer();
+            myView.deactivateTimer(); peerView.deactivateTimer();
             thisObject.startBtn.setText("QUIT");
             thisObject.pauseBtn.setText("RESUME");
             Toast.makeText(thisObject, "Game Paused", Toast.LENGTH_SHORT).show();
@@ -296,7 +235,7 @@ public class MainActivity extends Activity {
         @Override
         public void run() {
             setButtonsState();
-            myView.activateTimer();
+            myView.activateTimer(); peerView.activateTimer();
             thisObject.startBtn.setText("QUIT");
             thisObject.pauseBtn.setText("PAUSE");
             Toast.makeText(thisObject, "Game Resumed", Toast.LENGTH_SHORT).show();
@@ -306,21 +245,105 @@ public class MainActivity extends Activity {
         @Override
         public void run() {
             try{
-                MemGame.GameState state = myView.accept(myKey);
+                int ch = myKey;
+                MemGame.GameState state = myView.accept(ch);
+//                echoServer.send(ch);
 
                 if(state == MemGame.GameState.NewQuiz){
                     level++;
                     executeUICmd(UICmd.Start);
                 }
-                else if(state == MemGame.GameState.Over)
-                    executeUICmd(UICmd.Finish);
+                else if(state == MemGame.GameState.Over) {
+                    myView.printWrong();
+                    executeUICmd(UICmd.Start);
+                }
                 myView.invalidate();
-//                peerView.invalidate();
+                peerView.invalidate();
             } catch(Exception e) { e.printStackTrace(); }
         }
     };
 
+    private Runnable UpdateTimerHandler = new Runnable() {
+        @Override
+        public void run() {
+            TimeCounter.setText(sec + ":0" + minisec);
+
+            if((minisec == 0) && (sec == 0)) executeUICmd(UICmd.Finish);
+            if(minisec == 0) { minisec = 10; sec--; }
+            minisec --;
+        }
+    };
+    private class TimerTaskHandler extends TimerTask {
+        public void run(){
+            TimerHandler.post(UpdateTimerHandler);
+        }
+    }
+    private void activateTimer(){
+        if(timer == null){
+            TimerTaskHandler job = new TimerTaskHandler();
+            timer = new Timer(true);
+            timer.scheduleAtFixedRate(job, 100, 100);
+        }
+    }
+    private void deactivateTimer(){
+        if(timer != null){
+            timer.cancel();
+            timer = null;
+        }
+    }
+//    private Handler mainHandler2 = new Handler(){
+//        public void handleMessage(Message msg){
+//            switch(msg.what){
+//                case -1:
+//                    Toast.makeText(thisObject, "Socket aborted", Toast.LENGTH_SHORT).show();
+//                    Log.d("MainActivity", "Socket aborted");
+//                    break;
+//                case 1:
+//                    Toast.makeText(thisObject, "Socket connected", Toast.LENGTH_SHORT).show();
+//                    Log.d("MainActivity", "Socket connected");
+//                    break;
+//                case 2:
+//                    peerKey = (int)('0' - msg.arg1);
+//                    Log.d("MainActivity", "peerKey='"+peerKey+"'");
+//                    if(msg.arg1 == 0){
+//                        Toast.makeText(thisObject, "Socket available", Toast.LENGTH_SHORT).show();
+//                        Log.d("MainActivity", "Socket available");
+//                    }
+//                    else{
+//                        peerKey = (int)('0' - msg.arg1);
+//                        Log.d("MainActivity", "peerKey='"+peerKey+"'");
+//                            try{
+//                            MemGame.GameState state = peerView.accept(peerKey);
+//                                peerView.printClickBtn(peerKey);
+//                            if(state == MemGame.GameState.Over){
+//                                peerView.printWrong();
+//                                executeUICmd(UICmd.Start);
+//                            }
+//                        } catch(Exception e){
+//                            e.printStackTrace();
+//                        }
+//                        peerView.invalidate();
+//                    }
+//                    break;
+//                case 3:
+//                    Toast.makeText(thisObject, "Socket disconnected", Toast.LENGTH_SHORT).show();
+//                    Log.d("MainActivity", "Socket disconnected");
+//                    break;
+//                case 4:
+//                    Toast.makeText(thisObject, "Socket unavailable", Toast.LENGTH_SHORT).show();
+//                    Log.d("MainActivity", "Socket unavailable");
+//                    break;
+//                default:
+//                    Toast.makeText(thisObject, "mainHandler2 error", Toast.LENGTH_SHORT).show();
+//                    Log.d("MainActivity", "mainHandler2 error");
+//                    break;
+//            }
+//        };
+//    };
+
+
     private void setButtonsState(){
+        if(uiState == UIState.Error) return;
         boolean flagStart = buttonState[uiState.value()][0];
         boolean flagPause = buttonState[uiState.value()][1];
         boolean flagOther = buttonState[uiState.value()][2];
@@ -342,6 +365,39 @@ public class MainActivity extends Activity {
         Btn14.setEnabled(flagOther);
         Btn15.setEnabled(flagOther);
         Btn16.setEnabled(flagOther);
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        if(uiState == UIState.Running)
+            executeUICmd(UICmd.Pause);
+    }
+    @Override
+    protected void onResume(){
+        super.onResume();
+        if(uiState == UIState.Paused)
+            executeUICmd(UICmd.Resume);
+    }
+    @Override
+     protected void onDestroy(){
+        super.onDestroy();
+        Log.d("MainActivity", "onDestroy");
+//        echoServer.disconnect();
+    }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        switch (requestCode){
+            case getNetConfigInfo:
+                if(resultCode == RESULT_OK){
+                    serverHostName = data.getStringExtra("serverHostName");
+                    String s = data.getStringExtra("serverPort");
+                    serverPort = Integer.parseInt(s);
+                }
+                else if(resultCode == RESULT_CANCELED){
+                    Log.d("MainActivity", "NetConfigActivity canceled");
+                }
+                break;
+        }
     }
 
     @Override
