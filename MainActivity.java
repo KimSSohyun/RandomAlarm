@@ -38,10 +38,10 @@ public class MainActivity extends Activity {
         }
     }
     int[][] stateMatrix = {
-            {-1, 1, -1, -1, -1},
-            {0, -1, 2, 1, 1},
-            {0, 1, 2, -1, 1},
-            {0, 1, -1, 1, 1},
+            {-1, 2, -1, -1, -1},
+            {0, 2, 3, -1, -1},
+            {0, 2, 3, -1, 2},
+            {0, 2, -1, 2, 2},
     };
     boolean[][] buttonState = {
             {true, false, false},
@@ -126,7 +126,7 @@ public class MainActivity extends Activity {
                     Log.d("MainActivity", "startBtn pressed");
                     break;
                 case R.id.pauseBtn:
-                    if(uiState == UIState.Running || uiState == UIState.Show) 
+                    if(uiState == UIState.Running || uiState == UIState.Show)
                         uiCmd = UICmd.Pause;
                     else if(uiState == UIState.Paused) uiCmd = UICmd.Resume;
                     else Log.e("MainActivity", "uiState error!");
