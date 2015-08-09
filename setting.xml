@@ -67,27 +67,39 @@
             android:textOn="토" />
     </LinearLayout>
 
+
+
     <TimePicker
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/time_picker"
         android:layout_gravity="center"
-        android:layout_margin="10dp"/>
+        android:layout_marginTop="10dp"
+        />
 
     <LinearLayout
         android:orientation="horizontal"
-        android:gravity="right"
+        android:gravity="center"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
+
+        <Button
+        android:id="@+id/Musicsel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="음악 선택"
+        />
         <Button
             android:id="@+id/set"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="set"/>
-        <Button
-            android:id="@+id/reset"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="reset"/>
+            android:text="완료"/>
+        <!--<Button-->
+            <!--android:id="@+id/reset"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="reset"/>-->
     </LinearLayout>
 </LinearLayout>
