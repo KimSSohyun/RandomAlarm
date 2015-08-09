@@ -14,14 +14,14 @@
         android:id="@+id/newAlarm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onRegist"
-        android:text="새로운 알람 등록" />
+        android:text="새로운 알람 등록"
+        />
     <Button
         android:id="@+id/setting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onRegist"
-        android:text="알람 설정 변경" />
+        android:text="알람 설정 변경"
+        />
 
     <!--<Button-->
         <!--android:id="@+id/button2"-->
