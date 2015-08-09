@@ -18,6 +18,8 @@ public class Setting extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.setting);
+
         _toggleSun = (ToggleButton) findViewById(R.id.toggle_sun);
         _toggleMon = (ToggleButton) findViewById(R.id.toggle_mon);
         _toggleTue = (ToggleButton) findViewById(R.id.toggle_tue);
