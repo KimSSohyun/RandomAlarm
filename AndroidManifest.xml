@@ -23,7 +23,15 @@
         <activity
             android:name=".MusicList"
             android:label="@layout/musiclist">
-            </activity>
+        </activity>
+        <activity
+            android:name=".Setting"
+            android:label="@layout/setting">
+        </activity>
+        <activity
+            android:name=".checkAlarm"
+            android:label="@layout/alarm">
+        </activity>
     </application>
 
 </manifest>
