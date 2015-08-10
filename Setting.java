@@ -5,6 +5,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,7 +14,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TimePicker;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.io.File;
@@ -69,7 +69,7 @@ public class Setting extends Activity{
         });
     }
 
-        public void onRegist(View v)
+    public void onRegist(View v)
     {
         Log.i("Setting:onRegist", "|" + "========= regist" + "|");
 
@@ -126,7 +126,15 @@ public class Setting extends Activity{
                 case 999:
                     Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
                     if (uri != null) {
-                        String ringtonePath = uri.toString();
+                        Ringtone r=RingtoneManager.getRingtone(this, uri);
+//                        Cursor cursor = getContentResolver().query(uri, null, null, null, null );
+//                        cursor.moveToFirst();
+                        String ringtonePath
+//                                = uri.getPath();
+//                                = cursor.getString(cursor.getColumnIndex("_data"));
+                                = r.getTitle(this);
+//                                = uri.toString();
+                        Log.d("Setting", "Default music path: " + ringtonePath);
 //                        Toast.makeText(getApplicationContext(), "ringtone=" + ringtonePath, Toast.LENGTH_LONG).show();
                         filepath = ringtonePath;
                     }
