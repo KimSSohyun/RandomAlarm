@@ -5,7 +5,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.media.Ringtone;
+import android.database.Cursor;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -74,8 +74,13 @@ public class Setting extends Activity{
         Log.i("Setting:onRegist", "|" + "========= regist" + "|");
 
         showRingtonePickerDialog();
+//        Uri alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+//        Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(),  alert);
+//        filepath = filepath + "/" + ringtone.getTitle(this);
+        Log.d("Setting", "Default music path: " + filepath);
+
         File file = new File(filepath);
-        Log.i("MainActivity:onRegist", "| file exists? : " + file.exists() + "|" + file.hashCode());
+        Log.i("MainActivity:onRegist", "file exists? - " + file.exists() + " - " + file.hashCode());
 
         boolean[] week = { false, _toggleSun.isChecked(), _toggleMon.isChecked(), _toggleTue.isChecked(), _toggleWed.isChecked(),
                 _toggleThu.isChecked(), _toggleFri.isChecked(), _toggleSat.isChecked() }; // sunday=1 이라서 0의 자리에는 아무 값이나 넣었음
@@ -124,15 +129,18 @@ public class Setting extends Activity{
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case 999:
-                    Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+                    Uri uri
+                            = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+//                            = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
                     if (uri != null) {
-                        Ringtone r=RingtoneManager.getRingtone(this, uri);
-//                        Cursor cursor = getContentResolver().query(uri, null, null, null, null );
+//                        Ringtone r=RingtoneManager.getRingtone(this, uri);
+//                        Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(),  uri);
+                        Cursor cursor = getContentResolver().query(uri, null, null, null, null );
 //                        cursor.moveToFirst();
                         String ringtonePath
 //                                = uri.getPath();
-//                                = cursor.getString(cursor.getColumnIndex("_data"));
-                                = r.getTitle(this);
+                                = cursor.getString(cursor.getColumnIndex("_data"));
+//                                = ringtone.getTitle(this);
 //                                = uri.toString();
                         Log.d("Setting", "Default music path: " + ringtonePath);
 //                        Toast.makeText(getApplicationContext(), "ringtone=" + ringtonePath, Toast.LENGTH_LONG).show();
