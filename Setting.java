@@ -5,7 +5,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
+import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,7 +24,7 @@ import java.util.Calendar;
  */
 public class Setting extends Activity{
     private static final String BASE_PATH = Environment.getExternalStorageDirectory() + "";
-    private String filepath = BASE_PATH + "/media/MUSIC";
+    private String filepath;// = BASE_PATH + "/media/MUSIC";
     private AlarmManager _am;
     private TimePicker mTime;
 
@@ -74,9 +74,17 @@ public class Setting extends Activity{
         Log.i("Setting:onRegist", "|" + "========= regist" + "|");
 
         showRingtonePickerDialog();
+
 //        Uri alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-//        Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(),  alert);
-//        filepath = filepath + "/" + ringtone.getTitle(this);
+//        Ringtone ringtone = RingtoneManager.getRingtone(this,  alert);
+
+//        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+//        Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), notification);
+
+        Uri ringtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext() ,RingtoneManager.TYPE_NOTIFICATION);
+        Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), ringtoneUri);
+
+        filepath = filepath + "/" + ringtone.getTitle(this);
         Log.d("Setting", "Default music path: " + filepath);
 
         File file = new File(filepath);
@@ -115,17 +123,21 @@ public class Setting extends Activity{
 
 
     private void showRingtonePickerDialog() {
+        Log.d("Setting", "showRingtonePickerDialog()");
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select ringtone for notifications:");
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE,RingtoneManager.TYPE_NOTIFICATION);
+        Log.d("Setting", "will go to startAcitivityForResult()");
         startActivityForResult(intent, 777);
+        Log.d("Setting", "went to startAcitivityForResult()");
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d("Setting", "onActivityResult()");
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case 999:
@@ -133,14 +145,14 @@ public class Setting extends Activity{
                             = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
 //                            = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
                     if (uri != null) {
-//                        Ringtone r=RingtoneManager.getRingtone(this, uri);
-//                        Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(),  uri);
-                        Cursor cursor = getContentResolver().query(uri, null, null, null, null );
+//                        Ringtone r = RingtoneManager.getRingtone(this, uri);
+                        Ringtone r = RingtoneManager.getRingtone(getApplicationContext(),  uri);
+//                        Cursor cursor = getContentResolver().query(uri, null, null, null, null );
 //                        cursor.moveToFirst();
                         String ringtonePath
 //                                = uri.getPath();
-                                = cursor.getString(cursor.getColumnIndex("_data"));
-//                                = ringtone.getTitle(this);
+//                                = cursor.getString(cursor.getColumnIndex("_data"));
+                                = r.getTitle(this);
 //                                = uri.toString();
                         Log.d("Setting", "Default music path: " + ringtonePath);
 //                        Toast.makeText(getApplicationContext(), "ringtone=" + ringtonePath, Toast.LENGTH_LONG).show();
@@ -149,6 +161,7 @@ public class Setting extends Activity{
                     break;
 
                 default:
+                    Log.d("Setting", "It didn't enter in function!!!!");
                     break;
             }
         }
