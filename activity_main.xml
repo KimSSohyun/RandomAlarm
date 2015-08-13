@@ -10,12 +10,18 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal">
     <Button
         android:id="@+id/newAlarm"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="새로운 알람 등록"
+        android:layout_marginRight="10dp"
         />
     <Button
         android:id="@+id/setting"
@@ -24,6 +30,7 @@
         android:layout_weight="1"
         android:text="알람 설정 변경"
         />
+    </LinearLayout>
 
     <!--<Button-->
     <!--android:id="@+id/button2"-->
