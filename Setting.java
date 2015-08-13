@@ -73,13 +73,10 @@ public class Setting extends Activity{
     {
         Log.i("Setting:onRegist", "|" + "========= regist" + "|");
 
-        showRingtonePickerDialog();
+//        showRingtonePickerDialog();
 
-//        Uri alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-//        Ringtone ringtone = RingtoneManager.getRingtone(this,  alert);
-
-//        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-//        Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), notification);
+//        filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_ALARMS).toString();
+//        filepath = "/system/media/audio/notifications";
 
         Uri ringtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext() ,RingtoneManager.TYPE_NOTIFICATION);
         Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), ringtoneUri);
@@ -139,8 +136,8 @@ public class Setting extends Activity{
         super.onActivityResult(requestCode, resultCode, data);
         Log.d("Setting", "onActivityResult()");
         if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case 999:
+//            switch (requestCode) {
+//                case 999:
                     Uri uri
                             = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
 //                            = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
@@ -157,12 +154,12 @@ public class Setting extends Activity{
                         Log.d("Setting", "Default music path: " + ringtonePath);
 //                        Toast.makeText(getApplicationContext(), "ringtone=" + ringtonePath, Toast.LENGTH_LONG).show();
                         filepath = ringtonePath;
-                    }
-                    break;
-
-                default:
-                    Log.d("Setting", "It didn't enter in function!!!!");
-                    break;
+//                    }
+//                    break;
+//
+//                default:
+//                    Log.d("Setting", "It didn't enter in function!!!!");
+//                    break;
             }
         }
     }
