@@ -12,30 +12,32 @@
 
     <Button
         android:id="@+id/newAlarm"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="새로운 알람 등록"
         />
     <Button
         android:id="@+id/setting"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="알람 설정 변경"
         />
 
     <!--<Button-->
-        <!--android:id="@+id/button2"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:onClick="onUnregist"-->
-        <!--android:text="해지" />-->
+    <!--android:id="@+id/button2"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:onClick="onUnregist"-->
+    <!--android:text="해지" />-->
 
     <ListView
         android:id="@+id/Alarmlist"
         android:layout_height="fill_parent"
         android:layout_width="fill_parent"
-        android:layout_weight="1"
         android:drawSelectorOnTop="false"
+        android:layout_weight="6"
         >
     </ListView>
 
